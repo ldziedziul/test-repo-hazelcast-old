@@ -1,0 +1,37 @@
+on:
+  push:
+    branches:
+      - "master"
+      - "[0-9]+.[0-9]+.z"
+  pull_request_target:
+    branches:
+      - "master"
+      - "[0-9]+.[0-9]+.z"
+  workflow_dispatch:
+env:
+  branch_to_sync: ${{ github.base_ref || github.ref_name}}
+  sot_repo: hazelcast/test-repo-hazelcast-mono
+  destination_repo: hazelcast/test-repo-hazelcast
+jobs:
+  copybara-os:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Generate copybara config file
+        run: |
+          sed -e 's#<branch_to_sync>#${{ env.branch_to_sync }}#' \
+              -e 's#<sot_repo>#${{ env.sot_repo }}#' \
+              -e 's#<destination_repo>#${{ env.destination_repo }}#' \
+              .github/workflows/copybara-os.sky.template > .github/workflows/copybara-os.sky
+      - uses: ldziedziul/copybara-action@main
+        name: Copybara ${{ env.branch_to_sync }}
+        with:
+          ssh_key: ${{ secrets.GH_DEVOPSHAZELCAST_SSH_KEY }}
+          access_token: ${{ secrets.GH_TOKEN }}
+          sot_repo: ${{ env.sot_repo }}
+          sot_branch: ${{ env.branch_to_sync }}
+          destination_repo: ${{ env.destination_repo }}
+          copybara_options: "--nogit-destination-rebase --init-history"
+          custom_config: .github/workflows/copybara-os.sky

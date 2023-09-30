@@ -1,0 +1,66 @@
+
+# Variables
+SOT_REPO = "git@github.com:<sot_repo>.git>"
+SOT_BRANCH = "<branch_to_sync>"
+DESTINATION_REPO = "git@github.com:<destination_repo>.git"
+DESTINATION_BRANCH = "<branch_to_sync>"
+COMMITTER = "Github Actions <actions@github.com>"
+LOCAL_SOT = "file:///usr/src/app"
+
+PUSH_INCLUDE = ["hazelcast/**",".github/workflows/copybara-os.*"]
+PUSH_EXCLUDE = []
+PUSH_TRANSFORMATIONS = [
+]
+
+PR_INCLUDE = ["**"]
+PR_EXCLUDE = []
+PR_TRANSFORMATIONS = [
+        core.move("", "hazelcast", paths = glob(["**"])),
+        core.move("hazelcast/.github", ".github", paths = glob(["**"])),
+]
+
+# Push workflow
+core.workflow(
+    name = "push",
+    origin = git.origin(
+        url = LOCAL_SOT if LOCAL_SOT else SOT_REPO,
+        ref = SOT_BRANCH,
+    ),
+    destination = git.github_destination(
+        url = DESTINATION_REPO,
+        push = DESTINATION_BRANCH,
+    ),
+    origin_files = glob(PUSH_INCLUDE, exclude = PUSH_EXCLUDE),
+    authoring = authoring.pass_thru(default = COMMITTER),
+    mode = "ITERATIVE",
+    transformations = [
+        metadata.restore_author("ORIGINAL_AUTHOR", search_all_changes = True),
+        metadata.expose_label("COPYBARA_INTEGRATE_REVIEW"),
+    ] + PUSH_TRANSFORMATIONS if PUSH_TRANSFORMATIONS else core.reverse(PR_TRANSFORMATIONS),
+)
+
+# Pull Request workflow
+core.workflow(
+    name = "pr",
+    origin = git.github_pr_origin(
+        url = DESTINATION_REPO,
+        branch = DESTINATION_BRANCH,
+    ),
+    destination = git.github_pr_destination(
+        url = SOT_REPO,
+        destination_ref = SOT_BRANCH,
+        integrates = [],
+        title = "${GITHUB_PR_TITLE}",
+        update_description = True,
+    ),
+    destination_files = glob(PUSH_INCLUDE, exclude = PUSH_EXCLUDE),
+    origin_files = glob(PR_INCLUDE if PR_INCLUDE else ["**"], exclude = PR_EXCLUDE),
+    authoring = authoring.pass_thru(default = COMMITTER),
+    mode = "CHANGE_REQUEST",
+    set_rev_id = False,
+    transformations = [
+        metadata.squash_notes(prefix='Import of ${GITHUB_PR_URL}\n\n**Original PR description:**\n\n${GITHUB_PR_BODY}\n\nImported changes:\n\n', oldest_first = True, show_author=False),
+        metadata.expose_label("GITHUB_PR_NUMBER", new_name = "Closes", separator = DESTINATION_REPO.replace("git@github.com:", " ").replace(".git", "#")),
+        metadata.save_author("ORIGINAL_AUTHOR"),
+    ] + PR_TRANSFORMATIONS,
+)

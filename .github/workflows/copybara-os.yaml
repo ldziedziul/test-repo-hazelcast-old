@@ -33,5 +33,5 @@ jobs:
           sot_repo: ${{ env.sot_repo }}
           sot_branch: ${{ env.branch_to_sync }}
           destination_repo: ${{ env.destination_repo }}
-          copybara_options: "--nogit-destination-rebase --init-history"
+          copybara_options: "--nogit-destination-rebase"
           custom_config: .github/workflows/copybara-os.sky

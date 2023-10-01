@@ -1,6 +1,6 @@
 
 # Variables
-SOT_REPO = "git@github.com:<sot_repo>.git>"
+SOT_REPO = "git@github.com:<sot_repo>.git"
 SOT_BRANCH = "<branch_to_sync>"
 DESTINATION_REPO = "git@github.com:<destination_repo>.git"
 DESTINATION_BRANCH = "<branch_to_sync>"

@@ -16,7 +16,7 @@ PR_INCLUDE = ["**"]
 PR_EXCLUDE = []
 PR_TRANSFORMATIONS = [
         core.move("", "hazelcast", paths = glob(["**"])),
-        core.move("hazelcast/.github", ".github", paths = glob(["**"])),
+        core.move("hazelcast/.github", ".github", paths = glob(["workflows/copybara-os.*"])),
 ]
 
 # Push workflow

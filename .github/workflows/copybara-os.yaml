@@ -64,7 +64,7 @@ jobs:
         run: |
           PR_NUMBER="${{ github.event.pull_request.number }}"
           PR_BODY='${{ github.event.pull_request.body }}'
-          PR_BODY+=$(gh pr view PR_NUMBER --json comments -q '.comments[].body')
+          PR_BODY+=$(gh pr view "$PR_NUMBER" --json comments -q '.comments[].body')
 
           while read -r line; do
             if [[ $line =~ ^Closes\ ([^/]+)/([^/]+)#([0-9]+) ]]; then

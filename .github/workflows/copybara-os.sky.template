@@ -50,7 +50,7 @@ def _add_comment_with_shadow_pr_impl(ctx):
    ctx.console.info("Updating original PR description with info about internal PR")
    pr_number = ctx.revision.labels["GITHUB_PR_NUMBER"][0]
    for effect in ctx.effects:
-       if effect.type == "CREATED" and effect.destination_ref is not None and effect.destination_ref.url is not None:
+       if effect.type == "CREATED" and effect.destination_ref != None and effect.destination_ref.url != None:
               ctx.origin.post_issue_comment(int(pr_number), "Closes " + effect.destination_ref.url)
 
 # Pull Request workflow

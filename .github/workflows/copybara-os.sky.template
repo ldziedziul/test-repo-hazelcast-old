@@ -51,8 +51,7 @@ def _add_comment_with_shadow_pr_impl(ctx):
    pr_number = ctx.revision.labels["GITHUB_PR_NUMBER"][0]
    for effect in ctx.effects:
        if effect.type == "CREATED":
-              original_pr_name=SOT_REPO.replace("git@github.com:", " ").replace(".git", "#" + pr_number)
-              ctx.origin.post_issue_comment(int(pr_number), "Closes " + original_pr_name)
+              ctx.origin.post_issue_comment(int(pr_number), "Closes " + effect.destination_ref.url)
 
 # Pull Request workflow
 core.workflow(

@@ -46,10 +46,10 @@ jobs:
           set -x          
           PR_NUMBER="${{ github.event.pull_request.number }}"
           PR_BODY='${{ github.event.pull_request.body }}'
-          PR_BODY+="\n$(gh pr view "$PR_NUMBER" --json comments -q '.comments[].body')"
+          PR_BODY+="$(gh pr view "$PR_NUMBER" --json comments -q '.comments[].body')"
           
           while read -r line; do
-            if [[ $line =~ ^Closes\ ([^/]+)/([^/]+)#([0-9]+) ]]; then
+            if [[ $line =~ Closes\ ([^/]+)/([^/]+)#([0-9]+) ]]; then
               OWNER="${BASH_REMATCH[1]}"
               REPO="${BASH_REMATCH[2]}"
               OTHER_PR="${BASH_REMATCH[3]}"
@@ -67,10 +67,10 @@ jobs:
           set -x
           PR_NUMBER="${{ github.event.pull_request.number }}"
           PR_BODY='${{ github.event.pull_request.body }}'
-          PR_BODY+="\n$(gh pr view "$PR_NUMBER" --json comments -q '.comments[].body')"
+          PR_BODY+="$(gh pr view "$PR_NUMBER" --json comments -q '.comments[].body')"
 
           while read -r line; do
-            if [[ $line =~ ^Closes\ ([^/]+)/([^/]+)#([0-9]+) ]]; then
+            if [[ $line =~ Closes\ ([^/]+)/([^/]+)#([0-9]+) ]]; then
               OWNER="${BASH_REMATCH[1]}"
               REPO="${BASH_REMATCH[2]}"
               OTHER_PR="${BASH_REMATCH[3]}"

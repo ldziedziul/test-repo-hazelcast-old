@@ -6,4 +6,5 @@ one another change in OS
 fix for EE part
 change 1 in both places
 change 2 in both places
-change in os after copybara refactoring
+change 1 in os after copybara refactoring
+change 2 in os after copybara refactoring
